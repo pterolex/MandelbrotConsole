@@ -1,18 +1,17 @@
 #include <iostream>
 #include <time.h>
+#include <cmath>
 
 using namespace std;
 
-int main ()
+int drawFractal(double positiveImaginary,double negativeImaginary,double positiveReal, double negativeReal)
 {
-	time_t start,end;
-	time (&start);
     double realCoord, imagCoord;
     double realTemp, imagTemp, realTemp2, arg;
     int iterations;
-    for (imagCoord = 3; imagCoord >= -3; imagCoord -= 0.05)
+    for (imagCoord = positiveImaginary; imagCoord >= negativeImaginary; imagCoord -= 0.05)
     {
-        for (realCoord = -1; realCoord <= 1.77; realCoord += 0.03)
+        for (realCoord = positiveReal; realCoord >= negativeReal; realCoord -= 0.03)
         {
             iterations = 0;
             realTemp = realCoord;
@@ -31,7 +30,7 @@ int main ()
                 case 0:
                     cout<<"\33[0;31m"<<".";
                 break;
-            	case 1:
+                case 1:
                     cout<<"\33[0;32m"<<"o";
                 break;
                 case 2:
@@ -44,6 +43,16 @@ int main ()
         }
         cout<<"\n";
     }
+}
+
+int main ()
+{
+	time_t start,end;
+	time (&start);
+    for (int i=0;i<=100;i++)
+    {
+    drawFractal(1.5,-1.5,3,-3);
+}
     time (&end);
 	double dif = difftime (end,start);
 	printf ("Elasped time is %.2lf seconds.", dif );
