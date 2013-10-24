@@ -1,17 +1,21 @@
 #include <iostream>
+#include <fstream>
 #include <time.h>
 #include <cmath>
+#include <string.h>
 
 using namespace std;
 
-int drawFractal(double positiveImaginary,double negativeImaginary,double positiveReal, double negativeReal)
+void drawFractal(double positiveImaginary,double negativeImaginary,double positiveReal, double negativeReal)
 {
     double realCoord, imagCoord;
     double realTemp, imagTemp, realTemp2, arg;
+    double imaginaryStep = 0.05;
+    double realStep = 0.03;
     int iterations;
-    for (imagCoord = positiveImaginary; imagCoord >= negativeImaginary; imagCoord -= 0.05)
+    for (imagCoord = positiveImaginary; imagCoord >= negativeImaginary; imagCoord -= imaginaryStep)
     {
-        for (realCoord = positiveReal; realCoord >= negativeReal; realCoord -= 0.03)
+        for (realCoord = positiveReal; realCoord >= negativeReal; realCoord -= realStep)
         {
             iterations = 0;
             realTemp = realCoord;
@@ -37,7 +41,7 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
                     cout<<"\33[0;33m"<<"0";
                 break;
                 case 3:
-                    cout<<"\33[0;34m"<<"@";
+                    cout<<"\33[0;35m"<<"@";
                 break;
                     }
         }
@@ -45,15 +49,25 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
     }
 }
 
-int main ()
+void 
+int main()
 {
-	time_t start,end;
-	time (&start);
-    for (int i=0;i<=100;i++)
+    time_t start,end;
+    int times = 1000;
+    double positiveImaginary, negativeImaginary, positiveReal, negativeReal;
+    ifstream dataFile("input.txt");
+    ofstream outputFile("output.txt");
+    while (!dataFile.eof())
     {
-    drawFractal(1.5,-1.5,3,-3);
-}
-    time (&end);
-	double dif = difftime (end,start);
-	printf ("Elasped time is %.2lf seconds.", dif );
+        dataFile >> positiveImaginary >> negativeImaginary>>positiveReal>>negativeReal;
+        time (&start);
+        for (int i=0;i<=times;i++)
+        {
+            drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal);
+        }
+        time (&end);
+        double dif = difftime (end,start);
+        outputFile << dif <<"\n";
+    }
+
 }
