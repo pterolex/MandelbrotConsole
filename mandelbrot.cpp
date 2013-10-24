@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void drawFractal(double positiveImaginary,double negativeImaginary,double positiveReal, double negativeReal)
+void drawFractal(double positiveImaginary,double negativeImaginary,double positiveReal, double negativeReal,bool drawToConsole)
 {
     double realCoord, imagCoord;
     double realTemp, imagTemp, realTemp2, arg;
@@ -29,23 +29,29 @@ void drawFractal(double positiveImaginary,double negativeImaginary,double positi
                 arg = (realTemp * realTemp) + (imagTemp * imagTemp);
                 iterations += 1;
             }
-            switch (iterations % 4)
+            if (drawToConsole)
             {
-                case 0:
-                    cout<<"\33[0;31m"<<".";
-                break;
-                case 1:
-                    cout<<"\33[0;32m"<<"o";
-                break;
-                case 2:
-                    cout<<"\33[0;33m"<<"0";
-                break;
-                case 3:
-                    cout<<"\33[0;35m"<<"@";
-                break;
-                    }
+                switch (iterations % 4)
+                {
+                    case 0:
+                        cout<<"\33[0;31m"<<".";
+                    break;
+                    case 1:
+                        cout<<"\33[0;32m"<<"o";
+                    break;
+                    case 2:
+                        cout<<"\33[0;33m"<<"0";
+                    break;
+                    case 3:
+                        cout<<"\33[0;35m"<<"@";
+                    break;
+                }
+            }
         }
-        cout<<"\n";
+        if (drawToConsole)
+        {
+            cout<<"\n";
+        }
     }
 }
 
@@ -58,13 +64,13 @@ int main()
     {
         case 1:
         {
-            drawFractal(2,-2.2,2,-2);
+            drawFractal(2,-2.2,2,-2,true);
         }
         break;
         case 2:
         {
             time_t start,end;
-            int times = 1000;
+            int times = 100000;
             double positiveImaginary, negativeImaginary, positiveReal, negativeReal;
             ifstream dataFile("input.txt");
             ofstream outputFile("output.txt");
@@ -74,10 +80,12 @@ int main()
                 time (&start);
                 for (int i=0;i<=times;i++)
                 {
-                    drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal);
+                    drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal,false);
                 }
                 time (&end);
                 double dif = difftime (end,start);
+                cout << "Params: "<<  positiveImaginary << negativeImaginary<<positiveReal<<negativeReal<<"\n";
+                cout << "Time: "<<dif;
                 outputFile << dif <<"\n";
             }
         }
