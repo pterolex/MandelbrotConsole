@@ -49,25 +49,41 @@ void drawFractal(double positiveImaginary,double negativeImaginary,double positi
     }
 }
 
-void 
 int main()
-{
-    time_t start,end;
-    int times = 1000;
-    double positiveImaginary, negativeImaginary, positiveReal, negativeReal;
-    ifstream dataFile("input.txt");
-    ofstream outputFile("output.txt");
-    while (!dataFile.eof())
+{ 
+    int userChoice;
+    cout << "Choose an option:\n 1. Draw Mandelbrot set\n 2. Benchmark and write results to the output file\n 3. Exit\n";
+    cin >> userChoice;
+    switch (userChoice)
     {
-        dataFile >> positiveImaginary >> negativeImaginary>>positiveReal>>negativeReal;
-        time (&start);
-        for (int i=0;i<=times;i++)
+        case 1:
         {
-            drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal);
+            drawFractal(2,-2.2,2,-2);
         }
-        time (&end);
-        double dif = difftime (end,start);
-        outputFile << dif <<"\n";
+        break;
+        case 2:
+        {
+            time_t start,end;
+            int times = 1000;
+            double positiveImaginary, negativeImaginary, positiveReal, negativeReal;
+            ifstream dataFile("input.txt");
+            ofstream outputFile("output.txt");
+            while (!dataFile.eof())
+            {
+                dataFile >> positiveImaginary >> negativeImaginary>>positiveReal>>negativeReal;
+                time (&start);
+                for (int i=0;i<=times;i++)
+                {
+                    drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal);
+                }
+                time (&end);
+                double dif = difftime (end,start);
+                outputFile << dif <<"\n";
+            }
+        }
+        break;
+        default:
+            cout << "Your choice is wrong!";
     }
-
+    return 0;
 }
