@@ -87,7 +87,8 @@ int main()
                 double dif = difftime (end,start);
                 cout << "Params: "<<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<"\n";
                 cout << "Time: "<<dif<<"\n";
-                outputFile << dif <<"\n";
+                outputFile << "Params: "<<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<"\n";
+                outputFile << "Time: "<<dif<<"\n";
             }
         }
         break;
