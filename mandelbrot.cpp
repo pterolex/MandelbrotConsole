@@ -2,7 +2,6 @@
 #include <fstream>
 #include <time.h>
 #include <cmath>
-#include <string.h>
 
 using namespace std;
 
@@ -84,8 +83,8 @@ int main()
                 }
                 time (&end);
                 double dif = difftime (end,start);
-                cout << "Params: "<<  positiveImaginary << negativeImaginary<<positiveReal<<negativeReal<<"\n";
-                cout << "Time: "<<dif;
+                cout << "Params: "<<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<"\n";
+                cout << "Time: "<<dif<<"\n";
                 outputFile << dif <<"\n";
             }
         }
