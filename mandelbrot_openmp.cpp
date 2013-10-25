@@ -13,7 +13,7 @@ void drawFractal(double positiveImaginary,double negativeImaginary,double positi
     double imaginaryStep = 0.05;
     double realStep = 0.03;
     int iterations;
-    #omp pragma parallel for
+    #pragma omp parallel for
     for (imagCoord = positiveImaginary; imagCoord >= negativeImaginary; imagCoord -= imaginaryStep)
     {
         for (realCoord = positiveReal; realCoord >= negativeReal; realCoord -= realStep)
@@ -74,7 +74,7 @@ int main()
             int times = 100000;
             double positiveImaginary, negativeImaginary, positiveReal, negativeReal;
             ifstream dataFile("input.txt");
-            ofstream outputFile("output.txt");
+            ofstream outputFile("output_openmp.txt");
             while (!dataFile.eof())
             {
                 dataFile >> positiveImaginary >> negativeImaginary>>positiveReal>>negativeReal;
