@@ -93,7 +93,9 @@ int main()
     cout << "Choose an option:\n 1. Draw Mandelbrot set\n 2. Benchmark and write results to the output file\n 3. Exit\n";
     cin >> userChoice;
     int threadsNumber=1;
+    bool openMPEnabled = false;
     #if defined(_OPENMP)
+        openMPEnabled = true;
         cout << "Enter number of threads:\n";
         cin >> threadsNumber;
     #endif

@@ -58,12 +58,17 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
             realCoord = positiveReal -(j+1)*realStep;
         }
         imagCoord = positiveImaginary - (i+1)*imaginaryStep;
-        if (drawToConsole)
+    }
+   if (drawToConsole)
+    {
+        for (int i=0;i<lines;i++)
         {
+            for (int j = 0; j < columns; j++)
+                cout<<image[i*columns+j];
             cout<<"\n";
         }
     }
-   return lines*columns; 
+    return lines*columns; 
 }
 
 int main()
