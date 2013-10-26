@@ -23,7 +23,7 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
     }
     imagCoord=positiveImaginary;
     omp_set_num_threads(threadsNumber);
-    #pragma omp parallel for private(i,j,realCoord,imagCoord,realTemp,imagTemp,realTemp2,arg,iterations)
+    #pragma omp parallel for private(realCoord,imagCoord,realTemp,imagTemp,realTemp2,arg,iterations) 
     for (i=0;i<lines;i++)
     {
         realCoord = positiveReal;
@@ -59,9 +59,9 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
                     break;
                 }
             }
-            realCoord -= realStep;
+            realCoord = positiveReal -(j+1)*realStep;
         }
-        imagCoord -= imaginaryStep;
+        imagCoord = positiveImaginary - (i+1)*imaginaryStep;
         if (drawToConsole)
         {
             cout<<"\n";
@@ -99,8 +99,6 @@ int main()
                 omp_set_dynamic(0);
                 int symbols = drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal,threadsNumber,false);
                 t = clock() - t;
-                //cout << "Params: "<<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<" Symbols: "<<symbols;
-                //cout << " Time: "<<(((float)t)/CLOCKS_PER_SEC)<<"\n";
                 cout <<(((float)t)/CLOCKS_PER_SEC)<<"\n";
                 outputFile << "Params: "<<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<" Symbols: "<<symbols;
                 outputFile << " Time: "<<(((float)t)/CLOCKS_PER_SEC)<<"\n";

@@ -55,9 +55,9 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
                     break;
                 }
             }
-            realCoord -= realStep;
+            realCoord = positiveReal -(j+1)*realStep;
         }
-        imagCoord -= imaginaryStep;
+        imagCoord = positiveImaginary - (i+1)*imaginaryStep;
         if (drawToConsole)
         {
             cout<<"\n";
