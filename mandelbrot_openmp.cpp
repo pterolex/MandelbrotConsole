@@ -18,6 +18,7 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
     columns = ceil((abs(positiveReal)+abs(negativeReal))/realStep);
     lines = ceil((abs(positiveImaginary)+abs(negativeImaginary))/imaginaryStep);
     int imageSize = columns*lines;
+    int operations;
     char *image = new char[imageSize];
     if (drawToConsole)
     {
@@ -105,22 +106,26 @@ int main()
         break;
         case 2:
         {
-            clock_t t;
+            double dif;
             double positiveImaginary, negativeImaginary, positiveReal, negativeReal;
             ifstream dataFile("input.txt");
             ofstream outputFile("output_openmp.txt");
             while (!dataFile.eof())
             {
                 dataFile >> positiveImaginary >> negativeImaginary>>positiveReal>>negativeReal;
-                t = clock();
+                double start,end;
                 #if defined(_OPENMP)
+                    start = omp_get_wtime( );
                     omp_set_dynamic(0);
                 #endif
                 int symbols = drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal,threadsNumber,false);
-                t = clock() - t;
-                cout <<(((float)t)/CLOCKS_PER_SEC)<<"\n";
-                outputFile << "Params: "<<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<" Symbols: "<<symbols;
-                outputFile << " Time: "<<(((float)t)/CLOCKS_PER_SEC)<<"\n";
+                #if defined(_OPENMP)
+                    end = omp_get_wtime();
+                #endif
+                dif = end - start;
+                cout <<dif<<"\n";
+                outputFile <<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<" Symbols: "<<symbols;
+                outputFile << " Time: "<<dif<<"\n";
             }
         }
         break;
