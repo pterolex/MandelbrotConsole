@@ -13,7 +13,7 @@ void drawFractal(double positiveImaginary,double negativeImaginary,double positi
     double imaginaryStep = 0.05;
     double realStep = 0.03;
     int iterations;
-    #pragma omp parallel for
+    #pragma omp parallel for private(realCoord,imagCoord,realTemp,imagTemp,realTemp2,arg,iterations)
     for (imagCoord = positiveImaginary; imagCoord >= negativeImaginary; imagCoord -= imaginaryStep)
     {
         for (realCoord = positiveReal; realCoord >= negativeReal; realCoord -= realStep)
