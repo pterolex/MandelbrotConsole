@@ -12,11 +12,21 @@ void drawFractal(double positiveImaginary,double negativeImaginary,double positi
     double realTemp, imagTemp, realTemp2, arg;
     double imaginaryStep = 0.05;
     double realStep = 0.03;
-    int iterations;
-    #pragma omp parallel for private(realCoord,imagCoord,realTemp,imagTemp,realTemp2,arg,iterations)
-    for (imagCoord = positiveImaginary; imagCoord >= negativeImaginary; imagCoord -= imaginaryStep)
+    int iterations,columns=0,lines=0,i=0,j=0;
+    columns = ceil((abs(positiveReal)+abs(negativeReal))/realStep);
+    lines = ceil((abs(positiveImaginary)+abs(negativeImaginary))/imaginaryStep);
+    if (drawToConsole)
     {
-        for (realCoord = positiveReal; realCoord >= negativeReal; realCoord -= realStep)
+        cout << "Calculated columns: "<<columns<<"\n";
+        cout << "Calculated lines: "<<lines<<"\n";
+        cout << "Total symbols: "<<lines*columns<<"\n";
+    }
+    imagCoord=positiveImaginary;
+    #pragma omp parallel for private(i,j,realCoord,imagCoord,realTemp,imagTemp,realTemp2,arg,iterations) num_threads(2)
+    for (i=0;i<lines;i++)
+    {
+        realCoord = positiveReal;
+        for (j=0; j<columns;j++ )
         {
             iterations = 0;
             realTemp = realCoord;
@@ -48,7 +58,9 @@ void drawFractal(double positiveImaginary,double negativeImaginary,double positi
                     break;
                 }
             }
+            realCoord -= realStep;
         }
+        imagCoord -= imaginaryStep;
         if (drawToConsole)
         {
             cout<<"\n";
@@ -79,6 +91,7 @@ int main()
             {
                 dataFile >> positiveImaginary >> negativeImaginary>>positiveReal>>negativeReal;
                 time (&start);
+                omp_set_dynamic(0);
                 for (int i=0;i<=times;i++)
                 {
                     drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal,false);

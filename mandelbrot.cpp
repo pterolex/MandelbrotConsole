@@ -11,10 +11,20 @@ void drawFractal(double positiveImaginary,double negativeImaginary,double positi
     double realTemp, imagTemp, realTemp2, arg;
     double imaginaryStep = 0.05;
     double realStep = 0.03;
-    int iterations;
-    for (imagCoord = positiveImaginary; imagCoord >= negativeImaginary; imagCoord -= imaginaryStep)
+    int iterations,columns=0,lines=0;
+    columns = ceil((abs(positiveReal)+abs(negativeReal))/realStep);
+    lines = ceil((abs(positiveImaginary)+abs(negativeImaginary))/imaginaryStep);
+    if (drawToConsole)
     {
-        for (realCoord = positiveReal; realCoord >= negativeReal; realCoord -= realStep)
+        cout << "Calculated columns: "<<columns<<"\n";
+        cout << "Calculated lines: "<<lines<<"\n";
+        cout << "Total symbols: "<<lines*columns<<"\n";
+    }
+    imagCoord=positiveImaginary;
+    for (int i=0;i<lines;i++)
+    {
+        realCoord = positiveReal;
+        for (int j=0; j<columns;j++ )
         {
             iterations = 0;
             realTemp = realCoord;
@@ -46,7 +56,9 @@ void drawFractal(double positiveImaginary,double negativeImaginary,double positi
                     break;
                 }
             }
+            realCoord -= realStep;
         }
+        imagCoord -= imaginaryStep;
         if (drawToConsole)
         {
             cout<<"\n";
