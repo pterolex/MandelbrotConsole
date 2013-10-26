@@ -17,6 +17,8 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
     int iterations,columns=0,lines=0,i=0,j=0;
     columns = ceil((abs(positiveReal)+abs(negativeReal))/realStep);
     lines = ceil((abs(positiveImaginary)+abs(negativeImaginary))/imaginaryStep);
+    int imageSize = columns*lines;
+    char *image = new char[imageSize];
     if (drawToConsole)
     {
         cout << "Calculated columns: "<<columns<<"\n";
@@ -25,8 +27,8 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
     }
     imagCoord=positiveImaginary;
     #if defined(_OPENMP)
-    omp_set_num_threads(threadsNumber);
-    #pragma omp parallel for private(realCoord,imagCoord,realTemp,imagTemp,realTemp2,arg,iterations) 
+        omp_set_num_threads(threadsNumber);
+        #pragma omp parallel for private(i,j,realCoord,imagCoord,realTemp,imagTemp,realTemp2,arg,iterations) 
     #endif
     for (i=0;i<lines;i++)
     {
@@ -50,24 +52,33 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
                 switch (iterations % 4)
                 {
                     case 0:
-                        cout<<"\33[0;31m"<<".";
+                        //cout<<"\33[0;31m"<<".";
+                        image[i*columns+j]='.';
                     break;
                     case 1:
-                        cout<<"\33[0;32m"<<"o";
+                        //cout<<"\33[0;32m"<<"o";
+                        image[i*columns+j]='o';
                     break;
                     case 2:
-                        cout<<"\33[0;33m"<<"0";
+                        //cout<<"\33[0;33m"<<"0";
+                        image[i*columns+j]='0';
                     break;
                     case 3:
-                        cout<<"\33[0;35m"<<"@";
+                        //cout<<"\33[0;35m"<<"@";
+                        image[i*columns+j]='@';
                     break;
                 }
             }
             realCoord = positiveReal -(j+1)*realStep;
         }
         imagCoord = positiveImaginary - (i+1)*imaginaryStep;
-        if (drawToConsole)
+    }
+    if (drawToConsole)
+    {
+        for (int i=0;i<lines;i++)
         {
+            for (int j = 0; j < columns; j++)
+                cout<<image[i*columns+j];
             cout<<"\n";
         }
     }
@@ -80,9 +91,11 @@ int main()
     cout << "@@@ The program draws the Mandelbrot set in console using OpenMP\n";
     cout << "Choose an option:\n 1. Draw Mandelbrot set\n 2. Benchmark and write results to the output file\n 3. Exit\n";
     cin >> userChoice;
-    cout << "Enter number of threads:\n";
-    int threadsNumber;
-    cin >> threadsNumber;
+    int threadsNumber=1;
+    #if defined(_OPENMP)
+        cout << "Enter number of threads:\n";
+        cin >> threadsNumber;
+    #endif
     switch (userChoice)
     {
         case 1:
