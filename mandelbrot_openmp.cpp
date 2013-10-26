@@ -99,8 +99,9 @@ int main()
                 omp_set_dynamic(0);
                 int symbols = drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal,threadsNumber,false);
                 t = clock() - t;
-                cout << "Params: "<<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<" Symbols: "<<symbols;
-                cout << " Time: "<<(((float)t)/CLOCKS_PER_SEC)<<"\n";
+                //cout << "Params: "<<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<" Symbols: "<<symbols;
+                //cout << " Time: "<<(((float)t)/CLOCKS_PER_SEC)<<"\n";
+                cout <<(((float)t)/CLOCKS_PER_SEC)<<"\n";
                 outputFile << "Params: "<<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<" Symbols: "<<symbols;
                 outputFile << " Time: "<<(((float)t)/CLOCKS_PER_SEC)<<"\n";
             }
