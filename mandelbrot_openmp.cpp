@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void drawFractal(double positiveImaginary,double negativeImaginary,double positiveReal, double negativeReal,bool drawToConsole)
+int drawFractal(double positiveImaginary,double negativeImaginary,double positiveReal, double negativeReal,bool drawToConsole)
 {
     double realCoord, imagCoord;
     double realTemp, imagTemp, realTemp2, arg;
@@ -66,6 +66,7 @@ void drawFractal(double positiveImaginary,double negativeImaginary,double positi
             cout<<"\n";
         }
     }
+    return lines*columns; 
 }
 
 int main()
@@ -82,26 +83,21 @@ int main()
         break;
         case 2:
         {
-            time_t start,end;
-            int times = 100000;
+            clock_t t;
             double positiveImaginary, negativeImaginary, positiveReal, negativeReal;
             ifstream dataFile("input.txt");
             ofstream outputFile("output_openmp.txt");
             while (!dataFile.eof())
             {
                 dataFile >> positiveImaginary >> negativeImaginary>>positiveReal>>negativeReal;
-                time (&start);
+                t = clock();
                 omp_set_dynamic(0);
-                for (int i=0;i<=times;i++)
-                {
-                    drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal,false);
-                }
-                time (&end);
-                double dif = difftime (end,start);
-                cout << "Params: "<<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<"\n";
-                cout << "Time: "<<dif<<"\n";
-                outputFile << "Params: "<<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<"\n";
-                outputFile << "Time: "<<dif<<"\n";
+                int symbols = drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal,false);
+                t = clock() - t;
+                cout << "Params: "<<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<" Symbols: "<<symbols;
+                cout << " Time: "<<(((float)t)/CLOCKS_PER_SEC)<<"\n";
+                outputFile << "Params: "<<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<" Symbols: "<<symbols;
+                outputFile << " Time: "<<(((float)t)/CLOCKS_PER_SEC)<<"\n";
             }
         }
         break;
