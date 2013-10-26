@@ -69,6 +69,7 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
 int main()
 { 
     int userChoice;
+    cout << "@@@ The program draws the Mandelbrot set in console\n";
     cout << "Choose an option:\n 1. Draw Mandelbrot set\n 2. Benchmark and write results to the output file\n 3. Exit\n";
     cin >> userChoice;
     switch (userChoice)

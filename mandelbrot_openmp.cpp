@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int drawFractal(double positiveImaginary,double negativeImaginary,double positiveReal, double negativeReal,bool drawToConsole)
+int drawFractal(double positiveImaginary,double negativeImaginary,double positiveReal, double negativeReal,int threadsNumber,bool drawToConsole)
 {
     double realCoord, imagCoord;
     double realTemp, imagTemp, realTemp2, arg;
@@ -22,7 +22,8 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
         cout << "Total symbols: "<<lines*columns<<"\n";
     }
     imagCoord=positiveImaginary;
-    #pragma omp parallel for private(i,j,realCoord,imagCoord,realTemp,imagTemp,realTemp2,arg,iterations) num_threads(2)
+    omp_set_num_threads(threadsNumber);
+    #pragma omp parallel for private(i,j,realCoord,imagCoord,realTemp,imagTemp,realTemp2,arg,iterations)
     for (i=0;i<lines;i++)
     {
         realCoord = positiveReal;
@@ -72,13 +73,17 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
 int main()
 { 
     int userChoice;
+    cout << "@@@ The program draws the Mandelbrot set in console using OpenMP\n";
     cout << "Choose an option:\n 1. Draw Mandelbrot set\n 2. Benchmark and write results to the output file\n 3. Exit\n";
     cin >> userChoice;
+    cout << "Enter number of threads:\n";
+    int threadsNumber;
+    cin >> threadsNumber;
     switch (userChoice)
     {
         case 1:
         {
-            drawFractal(2,-2.2,2,-2,true);
+            drawFractal(2,-2.2,2,-2,threadsNumber,true);
         }
         break;
         case 2:
@@ -92,7 +97,7 @@ int main()
                 dataFile >> positiveImaginary >> negativeImaginary>>positiveReal>>negativeReal;
                 t = clock();
                 omp_set_dynamic(0);
-                int symbols = drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal,false);
+                int symbols = drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal,threadsNumber,false);
                 t = clock() - t;
                 cout << "Params: "<<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<" Symbols: "<<symbols;
                 cout << " Time: "<<(((float)t)/CLOCKS_PER_SEC)<<"\n";
