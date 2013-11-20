@@ -14,6 +14,9 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
     int iterations,columns=0,lines=0;
     columns = ceil((abs(positiveReal)+abs(negativeReal))/realStep);
     lines = ceil((abs(positiveImaginary)+abs(negativeImaginary))/imaginaryStep);
+    int imageSize = columns*lines;
+    int operations;
+    char *image = new char[imageSize];
     if (drawToConsole)
     {
         cout << "Calculated columns: "<<columns<<"\n";
@@ -42,16 +45,20 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
                 switch (iterations % 4)
                 {
                     case 0:
-                        cout<<"\33[0;31m"<<".";
+                        //cout<<"\33[0;31m"<<".";
+                        image[i*columns+j]='.';
                     break;
                     case 1:
-                        cout<<"\33[0;32m"<<"o";
+                        //cout<<"\33[0;32m"<<"o";
+                        image[i*columns+j]='.';
                     break;
                     case 2:
-                        cout<<"\33[0;33m"<<"0";
+                        //cout<<"\33[0;33m"<<"0";
+                        image[i*columns+j]='0';
                     break;
                     case 3:
-                        cout<<"\33[0;35m"<<"@";
+                        //cout<<"\33[0;35m"<<"@";
+                        image[i*columns+j]='@';
                     break;
                 }
             }
