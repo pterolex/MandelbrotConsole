@@ -3,3 +3,4 @@ Mandelbrot.sublime-project
 Mandelbrot.sublime-workspace
 output*
 m_omp
+mandelbrot_mpi.bin
