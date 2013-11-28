@@ -82,8 +82,6 @@ int main()
     cout << "@@@ The program draws the Mandelbrot set in console using MPICH2\n";
     cout << "Choose an option:\n 1. Draw Mandelbrot set\n 2. Benchmark and write results to the output file\n 3. Exit\n";
     cin >> userChoice;
-    int threadsNumber=1;
-    cout << "ololo";
     switch (userChoice)
     {
         case 1:
@@ -110,7 +108,7 @@ int main()
             {
                 dataFile >> positiveImaginary >> negativeImaginary>>positiveReal>>negativeReal;
                 double start,end;
-                int symbols = drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal,threadsNumber,false);
+                int symbols = drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal,false);
                 dif = end - start;
                 cout <<dif<<"\n";
                 outputFile <<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<" Symbols: "<<symbols;
