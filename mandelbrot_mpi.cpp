@@ -2,13 +2,11 @@
 #include <fstream>
 #include <time.h>
 #include <cmath>
-#if defined(_OPENMP)
-    #include <omp.h>
-#endif
+#include <mpi.h>
 
 using namespace std;
 
-int drawFractal(double positiveImaginary,double negativeImaginary,double positiveReal, double negativeReal,int threadsNumber,bool drawToConsole)
+int drawFractal(double positiveImaginary,double negativeImaginary,double positiveReal, double negativeReal,bool drawToConsole)
 {
     double realCoord, imagCoord;
     double realTemp, imagTemp, realTemp2, arg;
@@ -25,12 +23,8 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
         cout << "Calculated columns: "<<columns<<"\n";
         cout << "Calculated lines: "<<lines<<"\n";
         cout << "Total symbols: "<<lines*columns<<"\n";
-    }
+    }  
     imagCoord=positiveImaginary;
-    #if defined(_OPENMP)
-        omp_set_num_threads(threadsNumber);
-        #pragma omp parallel for private(i,j,realCoord,imagCoord,realTemp,imagTemp,realTemp2,arg,iterations) 
-    #endif
     for (i=0;i<lines;i++)
     {
         realCoord = positiveReal;
@@ -53,19 +47,15 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
                 switch (iterations % 4)
                 {
                     case 0:
-                        //cout<<"\33[0;31m"<<".";
                         image[i*columns+j]='.';
                     break;
                     case 1:
-                        //cout<<"\33[0;32m"<<"o";
                         image[i*columns+j]='o';
                     break;
                     case 2:
-                        //cout<<"\33[0;33m"<<"0";
                         image[i*columns+j]='0';
                     break;
                     case 3:
-                        //cout<<"\33[0;35m"<<"@";
                         image[i*columns+j]='@';
                     break;
                 }
@@ -88,22 +78,26 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
 
 int main()
 { 
-    int userChoice;
-    cout << "@@@ The program draws the Mandelbrot set in console using OpenMP\n";
+    int userChoice = 1;
+    cout << "@@@ The program draws the Mandelbrot set in console using MPICH2\n";
     cout << "Choose an option:\n 1. Draw Mandelbrot set\n 2. Benchmark and write results to the output file\n 3. Exit\n";
     cin >> userChoice;
     int threadsNumber=1;
-    bool openMPEnabled = false;
-    #if defined(_OPENMP)
-        openMPEnabled = true;
-        cout << "Enter number of threads:\n";
-        cin >> threadsNumber;
-    #endif
+    cout << "ololo";
     switch (userChoice)
     {
         case 1:
         {
-            drawFractal(2,-2.2,2,-2,threadsNumber,true);
+            MPI_Init(NULL, NULL);
+            int world_size;
+            MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+            int world_rank;
+            MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+            char processor_name[MPI_MAX_PROCESSOR_NAME];
+            int name_len;
+            MPI_Get_processor_name(processor_name, &name_len);
+            drawFractal(2,-2.2,2,-2,true);
+            MPI_Finalize();
         }
         break;
         case 2:
@@ -111,19 +105,12 @@ int main()
             double dif;
             double positiveImaginary, negativeImaginary, positiveReal, negativeReal;
             ifstream dataFile("input.txt");
-            ofstream outputFile("output_openmp.txt");
+            ofstream outputFile("output_mpi.txt");
             while (!dataFile.eof())
             {
                 dataFile >> positiveImaginary >> negativeImaginary>>positiveReal>>negativeReal;
                 double start,end;
-                #if defined(_OPENMP)
-                    start = omp_get_wtime( );
-                    omp_set_dynamic(0);
-                #endif
                 int symbols = drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal,threadsNumber,false);
-                #if defined(_OPENMP)
-                    end = omp_get_wtime();
-                #endif
                 dif = end - start;
                 cout <<dif<<"\n";
                 outputFile <<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<" Symbols: "<<symbols;
@@ -134,5 +121,6 @@ int main()
         default:
             cout << "Your choice is wrong!";
     }
+   
     return 0;
 }
