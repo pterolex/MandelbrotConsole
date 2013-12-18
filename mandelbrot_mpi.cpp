@@ -19,7 +19,8 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
     int imageSize = columns*lines;
     int operations;
     char *image = new char[imageSize];
-    char *image_part = new char[imageSize];
+    char *imagePart = new char[imageSize/world_size];
+    int imagePartSize = imageSize/world_size;
     if (drawToConsole && world_rank == 0)
     {
         cout << "Calculated columns: "<<columns<<"\n";
@@ -53,19 +54,19 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
                 {
                     case 0:
                     image[i*columns+j]='.';
-                    image_part[i*columns+j]='.';
+                    imagePart[i*columns+j]='.';
                     break;
                     case 1:
                     image[i*columns+j]='o';
-                    image_part[i*columns+j]='o';
+                    imagePart[i*columns+j]='o';
                     break;
                     case 2:
-                    image[i*columns+j]='0';
-                    image_part[i*columns+j]='0';
+                    image[i*columns+j]='o';
+                    imagePart[i*columns+j]='0';
                     break;
                     case 3:
-                    image[i*columns+j]='@';
-                    image_part[i*columns+j]='@';
+                    image[i*columns+j]='o';
+                    imagePart[i*columns+j]='@';
                     break;
                 }
             }
@@ -73,25 +74,26 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
         }
         imagCoord = positiveImaginary - (i+1)*imaginaryStep;
     }
-    if (world_rank != 0)
+    if (drawToConsole)
     {
-        MPI_Send(image_part, imageSize, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
-    }
-    if (world_rank == 0)
-    {
-        MPI_Recv(image_part, imageSize, MPI_CHAR, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        if (drawToConsole)
+        if (world_rank != 0)
         {
-            for (int i=0;i<ceil(lines/2)-1;i++)
+            MPI_Send(imagePart, imageSize, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
+        }
+        if (world_rank == 0)
+        {
+            MPI_Recv(imagePart, imageSize, MPI_CHAR, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+            for (int i=0;i<ceil(lines/2);i++)
             {
                 for (int j = 0; j < columns; j++)
                     cout<<image[i*columns+j];
                 cout<<"\n";
             }
-            for (int i=ceil(lines/2);i<lines;i++)
+            for (int i=ceil(lines/2)+1;i<lines;i++)
             {
                 for (int j = 0; j < columns; j++)
-                    cout<<image_part[i*columns+j];
+                    cout<<imagePart[i*columns+j];
                 cout<<"\n";
             }
         }
@@ -130,7 +132,9 @@ int main()
             {
                 dataFile >> positiveImaginary >> negativeImaginary>>positiveReal>>negativeReal;
                 double start,end;
+                start =  MPI_Wtime();
                 int symbols = drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal,false,world_rank,world_size);
+                end = MPI_Wtime();
                 dif = end - start;
                 cout <<dif<<"\n";
                 outputFile <<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<" Symbols: "<<symbols;
