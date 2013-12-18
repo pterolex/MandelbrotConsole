@@ -6,7 +6,8 @@
 
 using namespace std;
 
-int drawFractal(double positiveImaginary,double negativeImaginary,double positiveReal, double negativeReal,bool drawToConsole)
+
+int drawFractal(double positiveImaginary,double negativeImaginary,double positiveReal, double negativeReal,bool drawToConsole,int world_rank)
 {
     double realCoord, imagCoord;
     double realTemp, imagTemp, realTemp2, arg;
@@ -18,14 +19,17 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
     int imageSize = columns*lines;
     int operations;
     char *image = new char[imageSize];
-    if (drawToConsole)
+    char *image_part = new char[imageSize];
+    if (drawToConsole && world_rank == 0)
     {
         cout << "Calculated columns: "<<columns<<"\n";
         cout << "Calculated lines: "<<lines<<"\n";
         cout << "Total symbols: "<<lines*columns<<"\n";
     }  
     imagCoord=positiveImaginary;
-    for (i=0;i<lines;i++)
+    if (world_rank == 0)
+    {
+    for (i=0;i<ceil(lines/2);i++)
     {
         realCoord = positiveReal;
         for (j=0; j<columns;j++ )
@@ -64,38 +68,93 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
         }
         imagCoord = positiveImaginary - (i+1)*imaginaryStep;
     }
+}
+if (world_rank == 1)
+    {
+    for (i=ceil(lines/2)-1;i<lines;i++)
+    {
+        realCoord = positiveReal;
+        for (j=0; j<columns;j++ )
+        {
+            iterations = 0;
+            realTemp = realCoord;
+            imagTemp = imagCoord;
+            arg = (realCoord * realCoord) + (imagCoord * imagCoord);
+            while ((arg < 4) && (iterations < 40))
+            {
+                realTemp2 = (realTemp * realTemp) - (imagTemp * imagTemp) - realCoord;
+                imagTemp = (2 * realTemp * imagTemp) - imagCoord;
+                realTemp = realTemp2;
+                arg = (realTemp * realTemp) + (imagTemp * imagTemp);
+                iterations += 1;
+            }
+            if (drawToConsole)
+            {
+                switch (iterations % 4)
+                {
+                    case 0:
+                        image_part[i*columns+j]='.';
+                    break;
+                    case 1:
+                        image_part[i*columns+j]='o';
+                    break;
+                    case 2:
+                        image_part[i*columns+j]='0';
+                    break;
+                    case 3:
+                        image_part[i*columns+j]='@';
+                    break;
+                }
+            }
+            realCoord = positiveReal -(j+1)*realStep;
+        }
+        imagCoord = positiveImaginary - (i+1)*imaginaryStep;
+    }
+    if (world_rank == 1)
+    {
+    MPI_Send(image_part, imageSize, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
+}
+if (world_rank == 0)
+    {
+    MPI_Recv(image_part, imageSize, MPI_CHAR, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     if (drawToConsole)
     {
-        for (int i=0;i<lines;i++)
+        for (int i=0;i<ceil(lines/2)-1;i++)
         {
             for (int j = 0; j < columns; j++)
                 cout<<image[i*columns+j];
             cout<<"\n";
         }
+        for (int i=ceil(lines/2);i<lines;i++)
+        {
+            for (int j = 0; j < columns; j++)
+                cout<<image_part[i*columns+j];
+            cout<<"\n";
+        }
     }
+}
     return lines*columns; 
 }
 
 int main()
 { 
+    MPI_Init(NULL, NULL);
+    int world_size;
+    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+    int world_rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
     int userChoice = 1;
-    cout << "@@@ The program draws the Mandelbrot set in console using MPICH2\n";
-    cout << "Choose an option:\n 1. Draw Mandelbrot set\n 2. Benchmark and write results to the output file\n 3. Exit\n";
-    cin >> userChoice;
+    if (world_rank == 0)
+    {
+        cout << "@@@ The program draws the Mandelbrot set in console using MPICH2\n";
+        cout << "Choose an option:\n 1. Draw Mandelbrot set\n 2. Benchmark and write results to the output file\n 3. Exit\n";
+        cin >> userChoice;
+    }
     switch (userChoice)
     {
         case 1:
         {
-            MPI_Init(NULL, NULL);
-            int world_size;
-            MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-            int world_rank;
-            MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
-            char processor_name[MPI_MAX_PROCESSOR_NAME];
-            int name_len;
-            MPI_Get_processor_name(processor_name, &name_len);
-            drawFractal(2,-2.2,2,-2,true);
-            MPI_Finalize();
+            drawFractal(2,-2.2,2,-2,true,world_rank); 
         }
         break;
         case 2:
@@ -108,7 +167,7 @@ int main()
             {
                 dataFile >> positiveImaginary >> negativeImaginary>>positiveReal>>negativeReal;
                 double start,end;
-                int symbols = drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal,false);
+                int symbols = drawFractal(positiveImaginary,negativeImaginary,positiveReal,negativeReal,false,world_rank);
                 dif = end - start;
                 cout <<dif<<"\n";
                 outputFile <<  positiveImaginary <<" "<< negativeImaginary<<" "<<positiveReal<<" "<<negativeReal<<" Symbols: "<<symbols;
@@ -119,6 +178,6 @@ int main()
         default:
             cout << "Your choice is wrong!";
     }
-   
+    MPI_Finalize();
     return 0;
 }
