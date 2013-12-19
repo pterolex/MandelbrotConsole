@@ -19,8 +19,8 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
     int imageSize = columns*lines;
     int operations;
     char *image = new char[imageSize];
-    char *imagePart = new char[imageSize/world_size];
     int imagePartSize = imageSize/world_size;
+    char *imagePart = new char[imagePartSize];
     if (drawToConsole && world_rank == 0)
     {
         cout << "Calculated columns: "<<columns<<"\n";
@@ -30,7 +30,6 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
     imagCoord=positiveImaginary;
     int startLine = world_rank*(lines/world_size);
     int endLine = (world_rank+1)*(lines/world_size);
-    //cout << "Rank = "<<world_rank<<" from "<<world_size<<" # Counting from "<< startLine<<" to "<<endLine<<endl;
     for (i=startLine;i<endLine;i++)
     {
         realCoord = positiveReal;
@@ -53,20 +52,16 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
                 switch (iterations % 4)
                 {
                     case 0:
-                    image[i*columns+j]='.';
-                    imagePart[i*columns+j]='.';
+                    imagePart[(i-startLine)*columns+j]='.';
                     break;
                     case 1:
-                    image[i*columns+j]='o';
-                    imagePart[i*columns+j]='o';
+                    imagePart[(i-startLine)*columns+j]='o';
                     break;
                     case 2:
-                    image[i*columns+j]='o';
-                    imagePart[i*columns+j]='0';
+                    imagePart[(i-startLine)*columns+j]='0';
                     break;
                     case 3:
-                    image[i*columns+j]='o';
-                    imagePart[i*columns+j]='@';
+                    imagePart[(i-startLine)*columns+j]='@';
                     break;
                 }
             }
@@ -82,20 +77,22 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
         }
         if (world_rank == 0)
         {
-            MPI_Recv(imagePart, imageSize, MPI_CHAR, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-            for (int i=0;i<ceil(lines/2);i++)
-            {
-                for (int j = 0; j < columns; j++)
-                    cout<<image[i*columns+j];
-                cout<<"\n";
-            }
-            for (int i=ceil(lines/2)+1;i<lines;i++)
+            for (int i=0;i<endLine;i++)
             {
                 for (int j = 0; j < columns; j++)
                     cout<<imagePart[i*columns+j];
                 cout<<"\n";
             }
+            for (int i=1;i<world_size;i++)
+            {
+                MPI_Recv(imagePart, imageSize, MPI_CHAR, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                for (int j=1;j<(lines/world_size)-1;j++)
+                {
+                    for (int k = 0; k < columns; k++)
+                        cout<<imagePart[j*columns+k];
+                    cout<<"\n";
+                }
+            }  
         }
     }
     return lines*columns; 
