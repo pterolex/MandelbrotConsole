@@ -86,7 +86,7 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
             for (int i=1;i<world_size;i++)
             {
                 MPI_Recv(imagePart, imageSize, MPI_CHAR, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                for (int j=0;j<(lines/world_size);j++)
+                for (int j=1;j<(lines/world_size);j++)
                 {
                     for (int k = 0; k < columns; k++)
                         cout<<imagePart[j*columns+k];
