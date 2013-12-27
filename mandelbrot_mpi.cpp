@@ -17,8 +17,6 @@ int drawFractal(double positiveImaginary,double negativeImaginary,double positiv
     columns = ceil((abs(positiveReal)+abs(negativeReal))/realStep);
     lines = ceil((abs(positiveImaginary)+abs(negativeImaginary))/imaginaryStep);
     int imageSize = columns*lines;
-    int operations;
-    char *image = new char[imageSize];
     int imagePartSize = imageSize/world_size;
     char *imagePart = new char[imagePartSize];
     if (drawToConsole && world_rank == 0)
